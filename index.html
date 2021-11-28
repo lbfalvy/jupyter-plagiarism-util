@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="fuzzball.umd.min.js"></script>
+		<script>
+			const extractCode = ipynb => JSON.parse(ipynb)
+				.cells
+				.filter(c => c.cell_type == 'code')
+				.map(c => c.source)
+				.join('')
+
+			const fileToText = file => new Promise((resolve, reject) => {
+				const reader = new FileReader()
+				reader.onload = evt => {
+					if (evt.target.readyState != 2) return
+					else if (evt.target.error) reject(evt.target.error)
+					else resolve(evt.target.result)
+				}
+				reader.readAsText(file)
+			})
+
+			copy = null
+			orig = null
+			
+			async function onCopyChange(e) {
+				console.log('Copy changed', e)
+				if (!e.target.files[0]) return copy = null
+				copy = extractCode(await fileToText(e.target.files[0]))
+				diff()
+			}
+			async function onOrigChange(e) {
+				console.log('Orig changed', e)
+				if (!e.target.files[0]) return orig = null
+				orig = extractCode(await fileToText(e.target.files[0]))
+				diff()
+			}
+			function diff() {
+				console.log('Diffing', orig, copy)
+				const verdict = document.getElementById('verdict')
+				if (orig && copy) {
+					verdict.hidden = false
+					document.getElementById('percentage').textContent = fuzzball.ratio(orig, copy)
+				} else verdict.hidden = true
+			}
+
+		</script>
+	</head>
+	<body>
+		<div><input id='copy' type="file">Másolat</input></div>
+		<div><input id='orig' type="file">Eredeti</input></div>
+		<div id="verdict">
+			A fájlok <span id="percentage"></span>%-ban hasonlitanak
+		</div>
+		<script>
+			document.getElementById('copy').onchange = onCopyChange
+			document.getElementById('orig').onchange = onOrigChange
+			diff()
+		</script>
+	</body>
+</html>
