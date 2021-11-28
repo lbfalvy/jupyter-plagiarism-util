@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%">
 	<head>
 		<meta charset="UTF-8">
 		<script src="fuzzball.umd.min.js"></script>
@@ -45,16 +45,39 @@
 			}
 
 		</script>
+		<style>
+			html {
+				height: 100%;
+			}
+			body {
+				max-width: 100ex;
+				margin: auto;
+				margin-top: 50vh;
+				transform: translateY(-50%);
+				max-height: 100%;
+				padding: 10px;
+				box-sizing: border-box;
+			}
+		</style>
 	</head>
 	<body>
-		<div><input id='copy' type="file">Másolat</input></div>
-		<div><input id='orig' type="file">Eredeti</input></div>
+		<h1>Jupyter notebook plágiumellenőrző</h1>
+		<div><input id='copy' accept=".ipynb" type="file">Másolat</input></div>
+		<div><input id='orig' accept=".ipynb" type="file">Eredeti</input></div>
 		<div id="verdict">
-			A fájlok <span id="percentage"></span>%-ban hasonlitanak
+			A notebookok <span id="percentage"></span>%-ban hasonlitanak
 		</div>
+		<h2>Korlátok</h2>
+		<p>
+A markdown cellák tartalma egyáltalán nincs hatással az eredményre, és a kódcellák felosztása is csak annyiban hogy az egymást követő cellákat szóköz nékül fűzzük össze hasonlóságmérés előtt. A vizsgálat sajnos igen érzékeny a sorok sorrendjére tehát egymástól nem függő utasitások átrendezésével lehet csökkenteni a pontszámon. A szóközök kihagyása vagy beszúrása is hatással van a mérésre, de egynél több egymást követő szóközt, tabulátort illetve sortörést elemzés előtt összevon ezért például a behúzás változtatása semmit nem csinál. Mivel egyáltalán nincs szó kódelemzésről csak szöveghasonlóságot mérünk ezért a változónevek lecserélése, részeredmények kiemelése és tagok átrendezése mind változásnak számitanak.
+		</p>
 		<script>
-			document.getElementById('copy').onchange = onCopyChange
-			document.getElementById('orig').onchange = onOrigChange
+			const copyEl = document.getElementById('copy')
+			copyEl.value = ''
+			copyEl.onchange = onCopyChange
+			const origEl = document.getElementById('orig')
+			origEl.value = ''
+			origEl.onchange = onOrigChange
 			diff()
 		</script>
 	</body>
